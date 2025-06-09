@@ -1,4 +1,13 @@
 export const validateUserInfo = (req, res, next) => {
+    if(!req.body) {
+        return res.status(400).json({
+            data: {},
+            success: false,
+            message: 'Something went wrong',
+            error: 'Some credentials are missing'
+        });
+    }
+
     const { username, email, password } = req.body;
     if(!username || !email || !password) {
         return res.status(400).json({
@@ -12,6 +21,15 @@ export const validateUserInfo = (req, res, next) => {
 }
 
 export const validateUserLoginInfo = (req, res, next) => {
+    if(!req.body) {
+        return res.status(400).json({
+            data: {},
+            success: false,
+            message: 'Something went wrong',
+            error: 'Some credentials are missing'
+        });
+    }
+    
     const { email, password } = req.body;
     if(!email || !password) {
         return res.status(400).json({

@@ -1,5 +1,5 @@
 import UserRepository from "../repository/UserRepository.js";
-import { hashPassword, generateToken } from '../utils/passwordUtils.js';
+import { hashPassword, generateToken, comparePassword } from '../utils/passwordUtils.js';
 
 class UserService {
     constructor() {
@@ -50,8 +50,35 @@ class UserService {
         }
     }
 
-    async signin() {
-        
+    async signin(data) {
+        try {
+            // Find User
+            const user = await this.userRepository.findByEmail(data.email);
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            // Verify password
+            const isPasswordValid = await comparePassword(data.password, user.password);
+            if (!isPasswordValid) {
+                throw new Error('Invalid Credentials');
+            }
+
+            // Generate token
+            const payload = {
+                userId: user._id,
+                username: user.username,
+                email: user.email
+            }
+            const token = generateToken(payload);
+
+            // Exclude password from response, add token
+            const { password, ...userResponse } = user.toObject();
+            userResponse.token = token;
+            return userResponse;
+        } catch (error) {
+            throw new Error(`Error signing in user: ${error.message}`);
+        }
     }
 }
 
