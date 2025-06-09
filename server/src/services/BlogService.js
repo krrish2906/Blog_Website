@@ -17,6 +17,9 @@ class BlogService {
     async getBlogById(blogId) {
         try {
             const blog = await this.blogRepository.findById(blogId);
+            if(!blog) {
+                throw new Error("Blog not found");
+            }
             return blog;
         } catch (error) {
             throw new Error(`Error fetching blog: ${error.message}`);
@@ -26,6 +29,15 @@ class BlogService {
     async getAllBlogs() {
         try {
             const blogs = await this.blogRepository.findAll();
+            return blogs;
+        } catch (error) {
+            throw new Error(`Error fetching all blogs: ${error.message}`);
+        }
+    }
+    
+    async getAllPublishedBlogs() {
+        try {
+            const blogs = await this.blogRepository.findAllPublishedBlogs();
             return blogs;
         } catch (error) {
             throw new Error(`Error fetching all blogs: ${error.message}`);
@@ -42,6 +54,20 @@ class BlogService {
             return result;
         } catch (error) {
             throw new Error(`Error deleting blog: ${error.message}`);
+        }
+    }
+
+    async togglePublishStatus(blogId) {
+        try {
+            const blog = await this.blogRepository.findById(blogId);
+            if(!blog) {
+                throw new Error("Blog not found");
+            }
+            blog.isPublished = !blog.isPublished;
+            await blog.save();
+            return blog;
+        } catch (error) {
+            throw new Error(`Error toggling publish status: ${error.message}`);
         }
     }
 }
