@@ -22,6 +22,24 @@ class CommentService {
             throw new Error(`Error fetching comments for blog ${blogId}: ${error.message}`);
         }
     }
+
+    async deleteCommentById(commentId) {
+        try {
+            const comment = await this.commentRepository.destroy(commentId);
+            return comment;
+        } catch (error) {
+            throw new Error(`Error deleting comment ${commentId}: ${error.message}`);
+        }
+    }
+
+    async approveComment(commentId) {
+        try {
+            const comment = await this.commentRepository.approve(commentId);
+            return comment;
+        } catch (error) {
+            throw new Error(`Error approving comment ${commentId}: ${error.message}`);
+        }
+    }
 }
 
 export default CommentService;

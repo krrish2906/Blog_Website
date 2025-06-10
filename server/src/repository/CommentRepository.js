@@ -17,6 +17,24 @@ class CommentRepository extends CrudRepository {
             throw new Error(`Error fetching comments for blog ${blogId}: ${error.message}`);
         }
     }
+
+    async approve(commentId) {
+        try {
+            const comment = await Comment.findByIdAndUpdate(commentId, { isApproved: true }, { new: true });
+            return comment;
+        } catch (error) {
+            throw new Error(`Error approving comment ${commentId}: ${error.message}`);
+        }
+    }
+
+    async deleteAllCommentsOfBlog(blogId) {
+        try {
+            const response = await Comment.deleteMany({ blog: blogId });
+            return response;
+        } catch (error) {
+            throw new Error(`Error deleting comments: ${error.message}`);
+        }
+    }
 }
 
 export default CommentRepository;

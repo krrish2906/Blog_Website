@@ -40,3 +40,43 @@ export const getBlogComments = async (req, res) => {
         });
     }
 }
+
+export const deleteComment = async (req, res) => {
+    try {
+        const commentId = req.params.commentId;
+        const comment = await commentService.deleteCommentById(commentId);
+        return res.status(200).json({
+            data: comment,
+            success: true,
+            message: "Comment deleted successfully",
+            error: null 
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data: null,
+            success: false,
+            message: "Failed to delete comment",
+            error: error.message 
+        });
+    }
+}
+
+export const approveComment = async (req, res) => {
+    try {
+        const commentId = req.params.commentId;
+        const comment = await commentService.approveComment(commentId);
+        return res.status(200).json({
+            data: comment,
+            success: true,
+            message: "Comment approved successfully",
+            error: null 
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data: null,
+            success: false,
+            message: "Failed to approve comment",
+            error: error.message 
+        });
+    }
+}

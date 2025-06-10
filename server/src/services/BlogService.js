@@ -1,9 +1,11 @@
 import BlogRepository from "../repository/BlogRepository.js";
+import CommentRepository from "../repository/CommentRepository.js";
 import { uploadImage, imageURL } from '../utils/imagekitUtils.js'
 
 class BlogService {
     constructor() {
         this.blogRepository = new BlogRepository();
+        this.commentRepository = new CommentRepository();
     }
 
     async createBlog(data) {
@@ -58,6 +60,7 @@ class BlogService {
                 throw new Error("Blog not found");
             }
             const result = await this.blogRepository.destroy(blogId);
+            await this.commentRepository.deleteAllCommentsOfBlog(blogId);
             return result;
         } catch (error) {
             throw new Error(`Error deleting blog: ${error.message}`);
