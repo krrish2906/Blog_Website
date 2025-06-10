@@ -38,3 +38,23 @@ export const login = async (req, res) => {
         });
     }
 }
+
+export const getUserDashboardData = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const dashboardData = await userService.getUserDashboardData(userId);
+        return res.status(200).json({
+            data: dashboardData,
+            success: true,
+            message: "Dashboard data fetched successfully",
+            error: null
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data: null,
+            success: false,
+            message: "Failed to fetch dashboard data",
+            error: error.message
+        });
+    }
+}

@@ -35,6 +35,18 @@ class CommentRepository extends CrudRepository {
             throw new Error(`Error deleting comments: ${error.message}`);
         }
     }
+
+    async getCommentsCount(userId, blogIds) {
+        try {
+            // Recieved comments
+            const commentsCount = await Comment.countDocuments({ 
+                blog: { $in: blogIds }
+            });
+            return commentsCount;
+        } catch (error) {
+            throw new Error(`Error fetching comments count: ${error.message}`);
+        }
+    }
 }
 
 export default CommentRepository;

@@ -14,6 +14,24 @@ class BlogRepository extends CrudRepository {
             throw new Error(`Error fetching published blogs: ${error.message}`);
         }
     }
+    
+    async findAllBlogsOfUser(userId) {
+        try {
+            const blogs = await Blog.find({ author: userId });
+            return blogs;
+        } catch (error) {
+            throw new Error(`Error fetching user blogs: ${error.message}`);
+        }
+    }
+    
+    async getBlogsCount(userId) {
+        try {
+            const blogsCount = await Blog.countDocuments({ author: userId });
+            return blogsCount;
+        } catch (error) {
+            throw new Error(`Error fetching blogs count: ${error.message}`);
+        }
+    }
 }
 
 export default BlogRepository;

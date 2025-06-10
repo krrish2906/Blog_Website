@@ -4,17 +4,20 @@ const router = express.Router();
 
 // User Middlewares and Controllers:-
 import { validateUserInfo, validateUserLoginInfo, isAuthenticated } from '../../middlewares/UserMiddleware.js';
-import { signin, login } from '../../controllers/UserController.js';
+import { signin, login, getUserDashboardData } from '../../controllers/UserController.js';
+
 
 // User Routes:-
-router.post('/signup', validateUserInfo, signin);
-router.post('/login', validateUserLoginInfo, login);
+router.post('/user/signup', validateUserInfo, signin);
+router.post('/user/login', validateUserLoginInfo, login);
+router.get('/user/dashboard', isAuthenticated, getUserDashboardData);
 
 
 // Blog Middlewares and Controllers:-
 import { validateBlogInfo } from '../../middlewares/BlogMiddleware.js';
 import singleImageUploader from '../../middlewares/MulterMiddleware.js';
 import { createBlog, deleteBlog, getBlogById, getAllPublishedBlogs, toggleBlogPublishStatus } from '../../controllers/BlogController.js';
+
 
 // Blog Routes:-
 router.post('/blog/create', isAuthenticated, singleImageUploader, validateBlogInfo, createBlog);
@@ -27,6 +30,7 @@ router.patch('/blog/:id', isAuthenticated, toggleBlogPublishStatus);
 // Comment Middlewares and Controllers:-
 import { validateCommentInfo } from '../../middlewares/CommentMiddleware.js'
 import { createComment, getBlogComments, deleteComment, approveComment } from '../../controllers/CommentController.js'
+
 
 // Comment Routes:-
 router.post('/comment/create', validateCommentInfo, isAuthenticated, createComment);

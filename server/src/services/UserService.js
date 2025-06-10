@@ -1,9 +1,13 @@
 import UserRepository from "../repository/UserRepository.js";
+import BlogRepository from "../repository/BlogRepository.js";
+import CommentRepository from "../repository/CommentRepository.js";
 import { hashPassword, generateToken, comparePassword } from '../utils/passwordUtils.js';
 
 class UserService {
     constructor() {
         this.userRepository = new UserRepository();
+        this.blogRepository = new BlogRepository();
+        this.commentRepository = new CommentRepository();
     }
 
     async createUser(data) {
@@ -78,6 +82,20 @@ class UserService {
             return userResponse;
         } catch (error) {
             throw new Error(`Error signing in user: ${error.message}`);
+        }
+    }
+
+    async getUserDashboardData(userId) {
+        try {
+            const allBlogs = await this.blogRepository.findAllBlogsOfUser(userId);
+            const recentBlogs = allBlogs.slice(0, 5).sort((a, b) => b.createdAt - a.createdAt);
+
+            const blogsCount = allBlogs.length;
+            const commentsCount = await this.commentRepository.getCommentsCount(userId, allBlogs.map(blog => blog._id));
+            
+            return { recentBlogs, blogsCount, commentsCount };
+        } catch (error) {
+            throw new Error(`Error fetching user dashboard data: ${error.message}`);
         }
     }
 }
