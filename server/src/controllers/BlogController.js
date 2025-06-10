@@ -3,7 +3,8 @@ const blogService = new BlogService();
 
 export const createBlog = async (req, res) => {
     try {
-        const newBlog = await blogService.createBlog(req.body);
+        const blogData = { ...req.body, image: req.file };
+        const newBlog = await blogService.createBlog(blogData);
         return res.status(201).json({
             data: newBlog,
             success: true,

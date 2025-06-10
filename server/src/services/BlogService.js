@@ -1,4 +1,5 @@
 import BlogRepository from "../repository/BlogRepository.js";
+import { uploadImage, imageURL } from '../utils/imagekitUtils.js'
 
 class BlogService {
     constructor() {
@@ -7,7 +8,13 @@ class BlogService {
 
     async createBlog(data) {
         try {
-            const blog = await this.blogRepository.create(data);
+            // Upload image to ImageKit
+            const response = await uploadImage(data.image.buffer, data.image.originalname);
+            const image = imageURL(response.filePath);
+            
+            // Create blog with image URL
+            const blogData = { ...data, image };
+            const blog = await this.blogRepository.create(blogData);
             return blog;
         } catch (error) {
             throw new Error(`Error creating blog: ${error.message}`);

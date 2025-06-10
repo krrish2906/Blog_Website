@@ -1,10 +1,10 @@
 export const validateBlogInfo = (req, res, next) => {
-    if(!req.body) {
+    if(!req.body || !req.file) {
         return res.status(400).json({
             data: {},
             success: false,
-            message: "Blog Details are required",
-            error: "Missing Data"
+            message: "Blog Details and Image are required",
+            error: "Missing Data or Image"
         });
     }
     
@@ -13,8 +13,8 @@ export const validateBlogInfo = (req, res, next) => {
         return res.status(400).json({
             data: {},
             success: false,
-            error: "Some blog details are missing",
-            message: "Blog details are required"
+            error: "Some blog details are missing or image is not uploaded",
+            message: "Blog details and image are required"
         });
     }
     next();

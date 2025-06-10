@@ -9,6 +9,7 @@ import { signin, login } from '../../controllers/UserController.js';
 
 // Blog Middlewares and Controllers:-
 import { validateBlogInfo } from '../../middlewares/BlogMiddleware.js';
+import singleImageUploader from '../../middlewares/MulterMiddleware.js';
 import { createBlog, deleteBlog, getBlogById, getAllPublishedBlogs, toggleBlogPublishStatus } from '../../controllers/BlogController.js';
 
 
@@ -23,7 +24,7 @@ router.post('/login', validateUserLoginInfo, login);
 
 
 // Blog Routes:-
-router.post('/blog/create', validateBlogInfo, isAuthenticated, createBlog);
+router.post('/blog/create', isAuthenticated, singleImageUploader, validateBlogInfo, createBlog);
 router.delete('/blog/delete/:id', isAuthenticated, deleteBlog);
 router.get('/blog/:id', getBlogById);
 router.get('/blogs', getAllPublishedBlogs);
