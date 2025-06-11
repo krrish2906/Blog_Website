@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { assets, blogCategories } from '../assets/assets'
+import { assets, blogCategories } from '../../assets/assets'
 import Quill from 'quill'
-import { useAppContext } from '../contexts/AppContext'
+import { useAppContext } from '../../contexts/AppContext'
 import toast from 'react-hot-toast';
+import { parse } from 'marked'
 
 function AddBlog() {
     const { axios } = useAppContext();
@@ -10,6 +11,7 @@ function AddBlog() {
     const editorRef = useRef(null)
     const quillRef = useRef(null)
     
+    const [isGenerating, setIsGenerating] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({
         image: '',
@@ -52,7 +54,26 @@ function AddBlog() {
     }, [])
     
     async function generateContent() {
-        
+        if(!formData.title || formData.title.trim() === '') {
+            toast.error('Please enter the title of the blog');
+            return;
+        }
+        try {
+            setIsGenerating(true);
+            const { data } = await axios.post('/blog/gemini/generate', { prompt: formData.title });
+            const blogContent = parse(data.data.candidates[0].content.parts[0].text);
+
+            if (data.success) {
+                quillRef.current.root.innerHTML = blogContent;
+            }
+            else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setIsGenerating(false);
+        }
     }
     
     async function submitHandler(event) {
@@ -137,7 +158,7 @@ function AddBlog() {
                 <input
                     type="text"
                     placeholder='Type here'
-                    name="subTitle" id="subTitle" required
+                    name="subTitle" id="subTitle"
                     className='w-full max-w-lg mt-2 p-2 border border-gray-300 outline-none rounded'
                     onChange={formHandler}
                     value={formData.subTitle}
@@ -146,12 +167,22 @@ function AddBlog() {
                 <p className='mt-4'>Blog Description:</p>
                 <div className='max-w-lg h-74 pb-16 sm:pb-10 pt-2 relative'>
                     <div ref={editorRef}></div>
+                    {
+                        isGenerating && (
+                            <div
+                            className='absolute right-0 top-0 bottom-0 left-0 flex items-center justify-center transition-all duration-200 bg-primary/10 mt-2'>
+                                <div className='w-10 h-10 rounded-full border-3 border-t-primary animate-spin'>
+                                </div>
+                            </div>
+                        )
+                    }
                     <button
                         type='button'
                         onClick={generateContent}
+                        disabled={isGenerating}
                         className='absolute bottom-1 right-2 ml-2 text-xs text-white bg-primary/90 px-4 py-1.5 rounded hover:underline cursor-pointer hover:bg-primary transition-all duration-100'
                     >
-                        Generate with AI
+                        { !isGenerating ? "Generate with AI" : "Generating" }
                     </button>
                 </div>
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { Home, Blog } from "./pages/index";
-import { Layout, Dashboard, AddBlog, ListBlogs, Comments } from "./admin/index";
+import { Layout, Dashboard, AddBlog, ListBlogs, Comments } from "./pages/admin/index";
 import { Login } from "./components/admin/index";
 import 'quill/dist/quill.snow.css'
 import { Toaster } from 'react-hot-toast'

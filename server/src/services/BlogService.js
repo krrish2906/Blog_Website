@@ -1,6 +1,7 @@
 import BlogRepository from "../repository/BlogRepository.js";
 import CommentRepository from "../repository/CommentRepository.js";
 import { uploadImage, imageURL } from '../utils/imagekitUtils.js'
+import { generateUsingGemini } from "../config/geminiConfig.js";
 
 class BlogService {
     constructor() {
@@ -53,6 +54,15 @@ class BlogService {
         }
     }
 
+    async getAllBlogsOfUser(userId) {
+        try {
+            const blogs = await this.blogRepository.findAllBlogsOfUser(userId);
+            return blogs;
+        } catch (error) {
+            throw new Error(`Error fetching all blogs: ${error.message}`);
+        }
+    }
+
     async deleteBlog(blogId) {
         try {
             const blog = await this.blogRepository.findById(blogId);
@@ -78,6 +88,16 @@ class BlogService {
             return blog;
         } catch (error) {
             throw new Error(`Error toggling publish status: ${error.message}`);
+        }
+    }
+
+    async generateBlogContent(prompt) {
+        try {
+            prompt += '\n\nGenerate a blog content for this topic in simple text format';
+            const content = await generateUsingGemini(prompt);
+            return content;
+        } catch (error) {
+            throw error;
         }
     }
 }

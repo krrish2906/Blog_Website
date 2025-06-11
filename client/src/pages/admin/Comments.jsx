@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { comments_data } from "../assets/assets";
-import { CommentTableItem } from '../components/admin/index'
-import { useAppContext } from "../contexts/AppContext";
+import { comments_data } from "../../assets/assets";
+import { CommentTableItem } from '../../components/admin/index'
+import { useAppContext } from "../../contexts/AppContext";
 import toast from "react-hot-toast";
 
 function Comments() {
