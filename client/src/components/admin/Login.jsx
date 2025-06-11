@@ -1,6 +1,10 @@
 import React, { useState } from "react";
+import { useAppContext } from "../../contexts/AppContext";
+import toast from "react-hot-toast";
 
 function Login() {
+    const { axios, setToken } = useAppContext();
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -16,6 +20,25 @@ function Login() {
 
     async function handleSubmit(event) {
         event.preventDefault();
+        try {
+            const { data } = await axios.post('/user/login', formData, {
+                validateStatus: function (status) {
+                    return status < 500; 
+                }
+            });
+            
+            if(data.success) {
+                setToken(data.data.token);
+                localStorage.setItem('token', data.data.token);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${data.data.token}`;
+                toast.success(data.message);
+            }
+            else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
 
     return (
@@ -24,10 +47,10 @@ function Login() {
                 <div className="flex flex-col items-center justify-center">
                     <div className="w-full py-6 text-center">
                         <h1 className="text-3xl font-bold">
-                            <span className="text-primary">Admin</span> Login
+                            <span className="text-primary">User</span> Login
                         </h1>
                         <p className="font-light">
-                            Enter your credentials to access the admin panel
+                            Enter your credentials to access <br /> the dashboard panel
                         </p>
                     </div>
 

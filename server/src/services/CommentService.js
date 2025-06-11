@@ -1,8 +1,10 @@
 import CommentRepository from "../repository/CommentRepository.js";
+import BlogRepository from "../repository/BlogRepository.js";
 
 class CommentService {
     constructor() {
         this.commentRepository = new CommentRepository();
+        this.blogRepository = new BlogRepository();
     }
 
     async create(commentData) {
@@ -38,6 +40,23 @@ class CommentService {
             return comment;
         } catch (error) {
             throw new Error(`Error approving comment ${commentId}: ${error.message}`);
+        }
+    }
+
+    async getAllCommentsForUserBlogs(userId) {
+        try {
+            // First get all published blogs of the user
+            const publishedBlogs = await this.blogRepository.findByParameter({
+                author: userId,
+                isPublished: true
+            });
+            
+            // Get all comments for these blogs
+            const blogIds = publishedBlogs.map(blog => blog._id);
+            const comments = await this.commentRepository.getAllCommentsForUserBlogs(blogIds);
+            return comments;
+        } catch (error) {
+            throw new Error(`Error fetching all comments for user's blogs: ${error.message}`);
         }
     }
 }

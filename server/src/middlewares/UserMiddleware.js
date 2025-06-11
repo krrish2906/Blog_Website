@@ -45,12 +45,12 @@ export const validateUserLoginInfo = (req, res, next) => {
 }
 
 export const isAuthenticated = (req, res, next) => {
-    const token = req.headers['authorization'].split(' ')[1];
+    const token = req.headers['authorization'] ? req.headers['authorization'].split(' ')[1] : undefined;
     if(!token) {
         return res.status(401).json({
             data: {},
             success: false,
-            message: 'Unauthorized Access',
+            message: 'Please sign in to continue',
             error: 'No token provided'
         });
     }

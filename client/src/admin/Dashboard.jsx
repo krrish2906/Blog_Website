@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { assets, dashboard_data } from "../assets/assets";
 import { BlogTableItem } from "../components/admin/index";
+import { useAppContext } from "../contexts/AppContext";
+import toast from "react-hot-toast";
 
 function Dashboard() {
+    const { axios } = useAppContext();
     const [dashboardData, setDashboardData] = useState({
         blogs: 0,
         comments: 0,
@@ -11,7 +14,27 @@ function Dashboard() {
     });
 
     async function fetchDashboardData() {
-        setDashboardData(dashboard_data);
+        try {
+            const { data } = await axios.get('/user/dashboard', {
+                validateStatus: function (status) {
+                    return status < 500; 
+                }
+            });
+
+            if(data.success) {
+                setDashboardData({
+                    blogs: data.data.blogsCount,
+                    comments: data.data.commentsCount,
+                    drafts: data.data.drafts,
+                    recentBlogs: data.data.recentBlogs
+                })
+            }
+            else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
 
     useEffect(() => {
@@ -25,8 +48,7 @@ function Dashboard() {
                     <img src={assets.dashboard_icon_1} alt="" />
                     <div>
                         <p className="text-xl font-semibold text-gray-600">
-                            {" "}
-                            {dashboardData.blogs}{" "}
+                            { dashboardData.blogs }
                         </p>
                         <p className="text-gray-400 font-light">Blogs</p>
                     </div>
@@ -36,8 +58,7 @@ function Dashboard() {
                     <img src={assets.dashboard_icon_2} alt="" />
                     <div>
                         <p className="text-xl font-semibold text-gray-600">
-                            {" "}
-                            {dashboardData.comments}{" "}
+                            { dashboardData.comments }
                         </p>
                         <p className="text-gray-400 font-light">Comments</p>
                     </div>
@@ -47,8 +68,7 @@ function Dashboard() {
                     <img src={assets.dashboard_icon_3} alt="" />
                     <div>
                         <p className="text-xl font-semibold text-gray-600">
-                            {" "}
-                            {dashboardData.drafts}{" "}
+                            { dashboardData.drafts }
                         </p>
                         <p className="text-gray-400 font-light">Drafts</p>
                     </div>

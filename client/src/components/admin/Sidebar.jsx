@@ -7,7 +7,7 @@ function Sidebar() {
         <div className="flex flex-col border-r border-gray-200 min-h-full pt-6">
             <NavLink
                 end={true}
-                to="/admin"
+                to="/user"
                 className={({ isActive }) =>
                     `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-64 cursor-pointer ${isActive && "bg-primary/10 border-r-4 border-primary"}`
                 }
@@ -18,7 +18,7 @@ function Sidebar() {
 
             <NavLink
                 end={true}
-                to="/admin/add-blog"
+                to="/user/add-blog"
                 className={({ isActive }) =>
                     `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-64 cursor-pointer ${isActive && "bg-primary/10 border-r-4 border-primary"}`
                 }
@@ -29,7 +29,7 @@ function Sidebar() {
 
             <NavLink
                 end={true}
-                to="/admin/list-blog"
+                to="/user/list-blog"
                 className={({ isActive }) =>
                     `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-64 cursor-pointer ${isActive && "bg-primary/10 border-r-4 border-primary"}`
                 }
@@ -40,7 +40,7 @@ function Sidebar() {
 
             <NavLink
                 end={true}
-                to="/admin/comments"
+                to="/user/comments"
                 className={({ isActive }) =>
                     `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-64 cursor-pointer ${isActive && "bg-primary/10 border-r-4 border-primary"}`
                 }

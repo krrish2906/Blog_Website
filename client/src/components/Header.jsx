@@ -1,7 +1,21 @@
-import React from "react";
+import React, { useRef } from "react";
 import { assets } from "../assets/assets.js";
+import { useAppContext } from "../contexts/AppContext.jsx";
 
 function Header() {
+    const { input, setInput } = useAppContext();
+    const inputRef = useRef();
+
+    function onClear() {
+        setInput('');
+        inputRef.current.value = '';
+    }
+
+    async function formSubmitHandler(event) {
+        event.preventDefault();
+        setInput(inputRef.current.value)
+    }
+
     return (
         <div className="mx-8 sm:mx-16 xl:mx-24 relative">
             <div className="text-center mt-20 mb-8">
@@ -24,15 +38,24 @@ function Header() {
                 </p>
 
                 {/* Search Form */}
-                <form className="flex justify-between max-w-lg max-sm:scale-75 mx-auto border border-gray-300 bg-white rounded overflow-hidden">
+                <form
+                onSubmit={formSubmitHandler}
+                className="flex justify-between max-w-lg max-sm:scale-75 mx-auto border border-gray-300 bg-white rounded overflow-hidden">
                     <input
                         type="text"
-                        name=""
-                        id=""
+                        ref={inputRef}
                         placeholder="Search for blogs"
                         required
                         className="w-full pl-4 outline-none"
                     />
+                    {
+                        input &&
+                        <button
+                        onClick={onClear}
+                        className="bg-primary text-white px-8 py-2 m-1.5 rounded hover:scale-105 transition-all cursor-pointer">
+                            Clear
+                        </button>
+                    }
                     <button className="bg-primary text-white px-8 py-2 m-1.5 rounded hover:scale-105 transition-all cursor-pointer">
                         Search
                     </button>

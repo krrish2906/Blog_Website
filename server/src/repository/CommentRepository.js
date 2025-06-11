@@ -11,7 +11,7 @@ class CommentRepository extends CrudRepository {
             const comments = await Comment.find({
                 blog: blogId,
                 isApproved: true
-            }).sort({ createdAt: -1 });
+            }).populate('user').sort({ createdAt: -1 });
             return comments;
         } catch (error) {
             throw new Error(`Error fetching comments for blog ${blogId}: ${error.message}`);
@@ -36,7 +36,7 @@ class CommentRepository extends CrudRepository {
         }
     }
 
-    async getCommentsCount(userId, blogIds) {
+    async getCommentsCount(blogIds) {
         try {
             // Recieved comments
             const commentsCount = await Comment.countDocuments({ 
@@ -45,6 +45,17 @@ class CommentRepository extends CrudRepository {
             return commentsCount;
         } catch (error) {
             throw new Error(`Error fetching comments count: ${error.message}`);
+        }
+    }
+
+    async getAllCommentsForUserBlogs(blogIds) {
+        try {
+            const comments = await Comment.find({
+                blog: { $in: blogIds }
+            }).populate('user').populate('blog').sort({ createdAt: -1 });
+            return comments;
+        } catch (error) {
+            throw new Error(`Error fetching all comments for user's blogs: ${error.message}`);
         }
     }
 }

@@ -30,6 +30,14 @@ export const login = async (req, res) => {
             error: null
         });
     } catch (error) {
+        if(error.isOperational) {
+            return res.status(error.statusCode).json({
+                data: {},
+                success: false,
+                message: error.message,
+                error: error.message
+            });
+        }
         return res.status(500).json({
             data: {},
             success: false,

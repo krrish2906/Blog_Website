@@ -3,12 +3,16 @@ const commentService = new CommentService();
 
 export const createComment = async (req, res) => {
     try {
-        const { blog, user, content } = req.body;
-        const comment = await commentService.create({ blog, user, content });
+        const commentData = {
+            blog: req.body.blog,
+            content: req.body.content,
+            user: req.user.userId
+        }
+        const comment = await commentService.create(commentData);
         return res.status(201).json({
             data: comment,
             success: true,
-            message: "Comment created successfully",
+            message: "Comment added for review",
             error: null 
         });
     } catch (error) {
@@ -76,6 +80,26 @@ export const approveComment = async (req, res) => {
             data: null,
             success: false,
             message: "Failed to approve comment",
+            error: error.message 
+        });
+    }
+}
+
+export const getAllCommentsForUserBlogs = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const comments = await commentService.getAllCommentsForUserBlogs(userId);
+        return res.status(200).json({
+            data: comments,
+            success: true,
+            message: "All comments for user's blogs fetched successfully",
+            error: null 
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data: null,
+            success: false,
+            message: "Failed to fetch comments for user's blogs",
             error: error.message 
         });
     }

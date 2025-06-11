@@ -1,11 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { assets, blogCategories } from '../assets/assets'
 import Quill from 'quill'
+import { useAppContext } from '../contexts/AppContext'
+import toast from 'react-hot-toast';
 
 function AddBlog() {
+    const { axios } = useAppContext();
+    
     const editorRef = useRef(null)
     const quillRef = useRef(null)
-
+    
+    const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({
         image: '',
         imageFile: null,
@@ -14,14 +19,6 @@ function AddBlog() {
         category: 'All',
         isPublished: true 
     })
-
-    async function submitHandler(event) {
-        event.preventDefault();
-    }
-    
-    async function generateContent() {
-        
-    }
 
     async function formHandler(event) {
         const { name, value, files, checked } = event.target;
@@ -47,16 +44,65 @@ function AddBlog() {
         }));
     }
 
-    console.log(formData)
     useEffect(() => {
         // Initiate Quill only once
         if(!quillRef.current && editorRef.current) {
             quillRef.current = new Quill(editorRef.current, { theme: 'snow' })
         }
     }, [])
+    
+    async function generateContent() {
+        
+    }
+    
+    async function submitHandler(event) {
+        try {
+            event.preventDefault();
+            setIsAdding(true);
+
+            let { imageFile, ...blogData } = formData;
+            blogData = {
+                ...blogData,
+                content: quillRef.current.root.innerHTML
+            }
+            
+            const blogFormData = new FormData();
+            blogFormData.append('blog', JSON.stringify(blogData));
+            blogFormData.append('image', imageFile);
+
+            const { data } = await axios.post('/blog/create', blogFormData, {
+                validateStatus: function (status) {
+                    return status < 500; 
+                }
+            });
+            
+            if(data.success) {
+                toast.success(data.message);
+                quillRef.current.root.innerHTML = '';
+                setFormData({
+                    image: '',
+                    imageFile: null,
+                    title: '',
+                    subTitle: '',
+                    category: 'All',
+                    isPublished: true
+                });
+            }
+            else {
+                toast.error(data.error);
+            }
+        }
+        catch (error) {
+            toast.error(error.message);
+        }
+        finally {
+            setIsAdding(false);
+        }
+    }
 
     return (
         <form
+        encType='multipart/form-data'
         onSubmit={submitHandler}
         className='flex-1 bg-blue-50/50 text-gray-600 h-full overflow-scroll'
         >
@@ -135,8 +181,9 @@ function AddBlog() {
                 </div>
 
                 <button type='submit'
+                disabled={isAdding}
                 className='mt-8 w-40 h-10 bg-primary text-white rounded cursor-pointer text-sm'>
-                    Add Blog
+                    { isAdding ? 'Adding...' : 'Add Blog' }
                 </button>
             </div>
         </form>

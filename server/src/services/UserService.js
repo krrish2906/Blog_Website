@@ -2,6 +2,7 @@ import UserRepository from "../repository/UserRepository.js";
 import BlogRepository from "../repository/BlogRepository.js";
 import CommentRepository from "../repository/CommentRepository.js";
 import { hashPassword, generateToken, comparePassword } from '../utils/passwordUtils.js';
+import { AppError, AuthenticationError, NotFoundError, ValidationError } from '../utils/errors.js'
 
 class UserService {
     constructor() {
@@ -59,13 +60,13 @@ class UserService {
             // Find User
             const user = await this.userRepository.findByEmail(data.email);
             if (!user) {
-                throw new Error('User not found');
+                throw new NotFoundError('User not found');
             }
-
+            
             // Verify password
             const isPasswordValid = await comparePassword(data.password, user.password);
             if (!isPasswordValid) {
-                throw new Error('Invalid Credentials');
+                throw new AuthenticationError('Invalid Credentials');
             }
 
             // Generate token
@@ -81,6 +82,7 @@ class UserService {
             userResponse.token = token;
             return userResponse;
         } catch (error) {
+            if(error.isOperational) throw error;
             throw new Error(`Error signing in user: ${error.message}`);
         }
     }
@@ -88,12 +90,14 @@ class UserService {
     async getUserDashboardData(userId) {
         try {
             const allBlogs = await this.blogRepository.findAllBlogsOfUser(userId);
+            const draftedBlogs = allBlogs.filter((blog) => !blog.isPublished);
             const recentBlogs = allBlogs.slice(0, 5).sort((a, b) => b.createdAt - a.createdAt);
-
-            const blogsCount = allBlogs.length;
-            const commentsCount = await this.commentRepository.getCommentsCount(userId, allBlogs.map(blog => blog._id));
             
-            return { recentBlogs, blogsCount, commentsCount };
+            const blogsCount = allBlogs.length;
+            const drafts = draftedBlogs.length;
+            const commentsCount = await this.commentRepository.getCommentsCount(allBlogs.map(blog => blog._id));
+            
+            return { recentBlogs, blogsCount, commentsCount, drafts };
         } catch (error) {
             throw new Error(`Error fetching user dashboard data: ${error.message}`);
         }

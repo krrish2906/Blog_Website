@@ -6,6 +6,24 @@ class BlogRepository extends CrudRepository {
         super(Blog);
     }
 
+    async findByParameter(parameter) {
+        try {
+            const blogs = await Blog.find(parameter);
+            return blogs;
+        } catch (error) {
+            throw new Error(`Error finding blogs: ${error.message}`);
+        }
+    }
+
+    async findById(id) {
+        try {
+            const blog = await Blog.findById(id).populate('author');
+            return blog;
+        } catch (error) {
+            throw new Error(`Error finding blog with ID ${id}: ${error.message}`);
+        }
+    }
+
     async findAllPublishedBlogs() {
         try {
             const blogs = await Blog.find({ isPublished: true });

@@ -1,11 +1,16 @@
 import React from "react";
 import { assets } from "../assets/assets";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { Sidebar } from "../components/admin/index";
+import { useAppContext } from "../contexts/AppContext";
 
 function Layout() {
-    const navigate = useNavigate();
+    const { setToken, navigate, axios } = useAppContext();
+
     function logout() {
+        localStorage.removeItem('token');
+        axios.defaults.headers.common['Authorization'] = null;
+        setToken(null);
         navigate("/");
     }
 

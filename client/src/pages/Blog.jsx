@@ -3,24 +3,37 @@ import { useParams } from "react-router-dom";
 import Moment from "moment";
 import { Navbar, Footer, Loader } from "../components/index";
 import { assets, blog_data, comments_data } from "../assets/assets";
+import { useAppContext } from "../contexts/AppContext";
+import toast from "react-hot-toast";
 
 function Blog() {
+    const { axios } = useAppContext();
     const { id } = useParams();
     
     const [data, setData] = useState(null);
     const [comments, setComments] = useState([]);
+    
     const [formData, setFormData] = useState({
         name: "",
         comment: "",
     });
 
     async function fetchBlogData() {
-        let blog = blog_data.find((blog) => blog._id === id);
-        setData(blog);
+        try {
+            const { data } = await axios.get(`/blog/${id}`);
+            data.success ? setData(data.data) : toast.error(data.message);
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
 
     async function fetchComments() {
-        setComments(comments_data);
+        try {
+            const { data } = await axios.get(`/blog/${id}/comments`);
+            data.success ? setComments(data.data) : toast.error(data.message);
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
 
     async function handleFormData(event) {
@@ -31,8 +44,28 @@ function Blog() {
         }));
     }
 
-    function addComment(event) {
+    async function addComment(event) {
         event.preventDefault();
+        try {
+            const { data } = await axios.post('/comment/create', {
+                blog: id,
+                content: formData.comment
+            }, {
+                validateStatus: function (status) {
+                    return status < 500; 
+                }
+            });
+
+            if (data.success) {
+                toast.success(data.message);
+                setFormData({ name: "", comment: "" });
+            }    
+            else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
     }
 
     useEffect(() => {
@@ -54,21 +87,17 @@ function Blog() {
             {/* Introduction section */}
             <div className="text-center mt-20 text-gray-600">
                 <p className="text-primary py-4 font-medium">
-                    {" "}
-                    Published on{" "}
-                    {Moment(data.createdAt).format("MMMM Do YYYY")}{" "}
+                    Published on {" "}
+                    { Moment(data.createdAt).format("MMMM Do YYYY") }
                 </p>
                 <h1 className="text-2xl sm:text-5xl font-semibold max-w-2xl mx-auto text-gray-800">
-                    {" "}
-                    {data.title}{" "}
+                    { data.title }
                 </h1>
                 <h2 className="my-5 max-w-lg truncate mx-auto">
-                    {" "}
-                    {data.subTitle}{" "}
+                    { data.subtitle }
                 </h2>
                 <p className="inline-block py-1 px-4 rounded-full mb-6 border text-sm border-primary/35 bg-primary/5 font-medium text-primary">
-                    {" "}
-                    Michael Brown{" "}
+                    { data.author.username }
                 </p>
             </div>
 
@@ -81,7 +110,7 @@ function Blog() {
                 />
                 <div
                     className="rich-text max-w-3xl mx-auto"
-                    dangerouslySetInnerHTML={{ __html: data.description }}
+                    dangerouslySetInnerHTML={{ __html: data.content }}
                 ></div>
 
                 {/* Comments section */}
@@ -90,33 +119,32 @@ function Blog() {
                         Comments {`(${comments.length})`}
                     </p>
                     <div className="flex flex-col gap-4">
-                        {comments.map((comment, index) => {
-                            return (
-                                <div
-                                    key={index}
+                        {
+                            comments.map((comment, index) => {
+                                return (
+                                    <div key={index}
                                     className="relative bg-primary/2 border border-primary/5 max-w-xl p-4 rounded text-gray-600"
-                                >
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <img
-                                            src={assets.user_icon}
-                                            alt=""
-                                            className="w-6"
-                                        />
-                                        <p className="font-medium">
-                                            {" "}
-                                            {comment.name}{" "}
+                                    >
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <img
+                                                src={assets.user_icon}
+                                                alt=""
+                                                className="w-6"
+                                            />
+                                            <p className="font-medium">
+                                                { comment.user.username }
+                                            </p>
+                                        </div>
+                                        <p className="text-sm max-w-md ml-8">
+                                            { comment.content }
                                         </p>
+                                        <div className="absolute right-4 bottom-3 flex items-center gap-2 text-xs">
+                                            { Moment(comment.createdAt).fromNow() }
+                                        </div>
                                     </div>
-                                    <p className="text-sm max-w-md ml-8">
-                                        {" "}
-                                        {comment.content}{" "}
-                                    </p>
-                                    <div className="absolute right-4 bottom-3 flex items-center gap-2 text-xs">
-                                        {Moment(comment.createdAt).fromNow()}
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })
+                        }
                     </div>
                 </div>
 
@@ -132,7 +160,6 @@ function Blog() {
                             name="name"
                             id="name"
                             placeholder="Name"
-                            required
                             onChange={handleFormData}
                             value={formData.name}
                             className="w-full p-2 border border-gray-300 rounded outline-none"
