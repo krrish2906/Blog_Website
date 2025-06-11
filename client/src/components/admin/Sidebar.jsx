@@ -24,7 +24,7 @@ function Sidebar() {
                 }
             >
                 <img src={assets.add_icon} alt="" className="min-w-4 w-5" />
-                <p className="hidden md:inline-block">Add Blogs</p>
+                <p className="hidden md:inline-block">Add Blog</p>
             </NavLink>
 
             <NavLink

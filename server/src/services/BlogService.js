@@ -93,7 +93,10 @@ class BlogService {
 
     async generateBlogContent(prompt) {
         try {
-            prompt += '\n\nGenerate a blog content for this topic in simple text format';
+            const instructions = " Avoid phrases like \'Here\'s a blog post...\' or any meta commentary." +
+            "Skip such framing text and deliver only the core content.";
+            prompt = `Generate a blog content for this topic: ${prompt} \nin simple text format.${instructions}`;
+            console.log(prompt)
             const content = await generateUsingGemini(prompt);
             return content;
         } catch (error) {

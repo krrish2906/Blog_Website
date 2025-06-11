@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { assets, blogCategories } from '../../assets/assets'
-import Quill from 'quill'
 import { useAppContext } from '../../contexts/AppContext'
 import toast from 'react-hot-toast';
-import { parse } from 'marked'
+import { marked } from 'marked'
+import Quill from 'quill'
 
 function AddBlog() {
     const { axios } = useAppContext();
@@ -17,7 +17,7 @@ function AddBlog() {
         image: '',
         imageFile: null,
         title: '',
-        subTitle: '',
+        subtitle: '',
         category: 'All',
         isPublished: true 
     })
@@ -49,9 +49,19 @@ function AddBlog() {
     useEffect(() => {
         // Initiate Quill only once
         if(!quillRef.current && editorRef.current) {
-            quillRef.current = new Quill(editorRef.current, { theme: 'snow' })
+            quillRef.current = new Quill(editorRef.current, {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ header: [1, 2, false] }],
+                        ['bold', 'italic', 'underline'],
+                        [{ list: 'ordered' }, { list: 'bullet' }],
+                        ['link', 'image'],
+                    ]
+                }
+            });
         }
-    }, [])
+    }, []);
     
     async function generateContent() {
         if(!formData.title || formData.title.trim() === '') {
@@ -61,10 +71,10 @@ function AddBlog() {
         try {
             setIsGenerating(true);
             const { data } = await axios.post('/blog/gemini/generate', { prompt: formData.title });
-            const blogContent = parse(data.data.candidates[0].content.parts[0].text);
-
+            
             if (data.success) {
-                quillRef.current.root.innerHTML = blogContent;
+                const blogContent = marked(data.data.candidates[0].content.parts[0].text);
+                quillRef.current.clipboard.dangerouslyPasteHTML(blogContent);
             }
             else {
                 toast.error(data.message);
@@ -104,7 +114,7 @@ function AddBlog() {
                     image: '',
                     imageFile: null,
                     title: '',
-                    subTitle: '',
+                    subtitle: '',
                     category: 'All',
                     isPublished: true
                 });
@@ -158,10 +168,10 @@ function AddBlog() {
                 <input
                     type="text"
                     placeholder='Type here'
-                    name="subTitle" id="subTitle"
+                    name="subtitle" id="subtitle"
                     className='w-full max-w-lg mt-2 p-2 border border-gray-300 outline-none rounded'
                     onChange={formHandler}
-                    value={formData.subTitle}
+                    value={formData.subtitle}
                 />
 
                 <p className='mt-4'>Blog Description:</p>
@@ -213,7 +223,7 @@ function AddBlog() {
 
                 <button type='submit'
                 disabled={isAdding}
-                className='mt-8 w-40 h-10 bg-primary text-white rounded cursor-pointer text-sm'>
+                className={`mt-8 w-40 h-10 text-white ${ isAdding ? "bg-primary/70" : "bg-primary" } rounded cursor-pointer text-sm`}>
                     { isAdding ? 'Adding...' : 'Add Blog' }
                 </button>
             </div>
