@@ -1,7 +1,7 @@
 import UserService from "../services/UserService.js";
 const userService = new UserService();
 
-export const signin = async (req, res) => {
+export const signup = async (req, res) => {
     try {
         const user = await userService.createUser(req.body);
         return res.status(201).json({

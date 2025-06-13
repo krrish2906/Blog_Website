@@ -4,11 +4,11 @@ const router = express.Router();
 
 // User Middlewares and Controllers:-
 import { validateUserInfo, validateUserLoginInfo, isAuthenticated } from '../../middlewares/UserMiddleware.js';
-import { signin, login, getUserDashboardData } from '../../controllers/UserController.js';
+import { signup, login, getUserDashboardData } from '../../controllers/UserController.js';
 
 
 // User Routes:-
-router.post('/user/signup', validateUserInfo, signin);
+router.post('/user/signup', validateUserInfo, signup);
 router.post('/user/login', validateUserLoginInfo, login);
 router.get('/user/dashboard', isAuthenticated, getUserDashboardData);
 
