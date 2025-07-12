@@ -3,10 +3,11 @@ import { useAppContext } from "../../contexts/AppContext";
 import toast from "react-hot-toast";
 import { NavLink } from "react-router-dom";
 
-function Login() {
+function SignUp() {
     const { axios, setToken } = useAppContext();
 
     const [formData, setFormData] = useState({
+        username: "",
         email: "",
         password: "",
     });
@@ -22,7 +23,7 @@ function Login() {
     async function handleSubmit(event) {
         event.preventDefault();
         try {
-            const { data } = await axios.post('/user/login', formData, {
+            const { data } = await axios.post('/user/signup', formData, {
                 validateStatus: function (status) {
                     return status < 500; 
                 }
@@ -48,7 +49,7 @@ function Login() {
                 <div className="flex flex-col items-center justify-center">
                     <div className="w-full py-6 text-center">
                         <h1 className="text-3xl font-bold">
-                            <span className="text-primary">User</span> Login
+                            <span className="text-primary">User</span> SignUp
                         </h1>
                         <p className="font-light mt-1">
                             Enter your credentials to access <br /> the dashboard panel
@@ -59,6 +60,20 @@ function Login() {
                         onSubmit={handleSubmit}
                         className="w-full mt-6 sm:max-w-md text-gray-600"
                     >
+                        <div className="flex flex-col">
+                            <label htmlFor="username">Username</label>
+                            <input
+                                type="text"
+                                required
+                                placeholder="your username"
+                                id="username"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleFormData}
+                                className="border-b-2 border-gray-300 p-2 outline-none mb-6"
+                            />
+                        </div>
+                        
                         <div className="flex flex-col">
                             <label htmlFor="email">Email</label>
                             <input
@@ -88,8 +103,8 @@ function Login() {
                         </div>
 
                         <div className="flex justify-end text-sm mt-[-8px] mb-3">
-                            <p>Dont have an account?{" "}
-                                <span className="text-primary"><NavLink to='/signup'>Create Account</NavLink></span>
+                            <p>Already have an account?{" "}
+                                <span className="text-primary"><NavLink to='/user'>Sign In</NavLink></span>
                             </p>
                         </div>
 
@@ -97,7 +112,7 @@ function Login() {
                             className="w-full py-3 font-medium bg-primary text-white rounded cursor-pointer hover:bg-primary/90 transition-all"
                             type="submit"
                         >
-                            Login
+                            Sign Up
                         </button>
                     </form>
                 </div>
@@ -106,4 +121,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default SignUp;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Moment from "moment";
 import { Navbar, Footer, Loader } from "../components/index";
-import { assets, blog_data, comments_data } from "../assets/assets";
+import { assets } from "../assets/assets";
 import { useAppContext } from "../contexts/AppContext";
 import toast from "react-hot-toast";
 
@@ -14,7 +14,6 @@ function Blog() {
     const [comments, setComments] = useState([]);
     
     const [formData, setFormData] = useState({
-        name: "",
         comment: "",
     });
 
@@ -155,16 +154,6 @@ function Blog() {
                         onSubmit={addComment}
                         className="flex flex-col items-start gap-4 max-w-lg"
                     >
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            placeholder="Name"
-                            onChange={handleFormData}
-                            value={formData.name}
-                            className="w-full p-2 border border-gray-300 rounded outline-none"
-                        />
-
                         <textarea
                             name="comment"
                             id="comment"

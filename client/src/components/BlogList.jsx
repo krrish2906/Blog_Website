@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import BlogCard from "./BlogCard";
-import { blogCategories, blog_data } from "../assets/assets";
+import { blogCategories } from "../assets/assets";
 import { useAppContext } from "../contexts/AppContext";
 
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import Notfound from "./Notfound";
 
 function BlogList() {
     const [menu, setMenu] = useState("All");
@@ -27,18 +28,20 @@ function BlogList() {
                                 onClick={() => setMenu(category)}
                                 className={`relative cursor-pointer text-gray-500 ${menu === category && "text-white"} rounded-full px-4 py-0.5`}
                             >
-                                {category}
-                                {menu === category && (
-                                    <motion.div
-                                        layoutId="underline"
-                                        transition={{
-                                            type: "spring",
-                                            stiffness: 500,
-                                            damping: 30,
-                                        }}
-                                        className="absolute left-0 right-0 top-0 h-7 -z-1 bg-primary rounded-full"
-                                    ></motion.div>
-                                )}
+                                { category }
+                                {
+                                    menu === category && (
+                                        <motion.div
+                                            layoutId="underline"
+                                            transition={{
+                                                type: "spring",
+                                                stiffness: 500,
+                                                damping: 30,
+                                            }}
+                                            className="absolute left-0 right-0 top-0 h-7 -z-1 bg-primary rounded-full"
+                                        ></motion.div>
+                                    )
+                                }
                             </button>
                         </div>
                     ))
@@ -53,6 +56,13 @@ function BlogList() {
                     })
                 }
             </div>
+            {
+                filteredBlogs().filter((blog) => menu === "All" || blog.category === menu).length == 0 && (
+                    <div className="w-full flex justify-center mx-auto">
+                        <Notfound />
+                    </div>
+                )
+            }
         </div>
     );
 }
